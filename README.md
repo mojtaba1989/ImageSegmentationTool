@@ -33,4 +33,4 @@ This application is an Image Segmentation Tool designed to process and analyze i
 - Py-OpenCV 3.4.2
 - PyQt5 5.9.2 
 
-Generate by ChatGPT
+README Generate by ChatGPT
