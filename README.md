@@ -29,11 +29,14 @@ This application is an Image Segmentation Tool designed to process and analyze i
 - **Help and About:** Access the help and about information through the menu.
 
 ## Dependencies
-- OpenCV
-- PyQt5
+- Python 3.6
+- Py-OpenCV 3.4.2
+- PyQt5 5.9.2 
 
 ## How to Run
 Ensure you have the necessary dependencies installed, then run the application using your preferred Python environment.
 
 ```bash
-python your_app_file.py
+python image_seg_tool.py
+
+Generate by ChatGPT
