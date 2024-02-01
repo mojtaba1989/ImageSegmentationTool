@@ -397,6 +397,8 @@ class Ui_MainWindow(object):
         self.actionNext.triggered.connect(self.next_command)
         self.actionPrevious.triggered.connect(self.previous_command)
         self.actionShow_Mask.triggered.connect(self.actionShow_Mask_command)
+        self.actionHelp.triggered.connect(self.showHelpDialog)
+        self.actionAbout.triggered.connect(self.showAboutDialog)
 
         self.mask.clicked.connect(self.mask_command)
         self.next.clicked.connect(self.next_command)
@@ -1112,6 +1114,76 @@ class Ui_MainWindow(object):
                 json_data = json.dumps(self.DICT, indent=4)
                 with open(os.path.join(self.DIRECTORY, 'labels/report.json'), 'w') as f:
                     f.write(json_data)
+    
+    def showHelpDialog(self):
+        help_dialog = HelpDialog()
+        help_dialog.exec_()
+
+    def showAboutDialog(self):
+        about_dialog = AboutDialog()
+        about_dialog.exec_()
+
+class HelpDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle('Help')
+        self.setGeometry(100, 100, 400, 200)
+
+        self.initUI()
+
+    def initUI(self):
+        try:
+            with open('README.md', 'r', encoding='utf-8') as file:
+                readme_content = file.read()
+        except FileNotFoundError:
+            readme_content = 'README.md not found.'
+        help_label = QtWidgets.QLabel(readme_content)
+        ok_button = QtWidgets.QPushButton('OK', self)
+        ok_button.clicked.connect(self.accept)
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(help_label)
+        layout.addWidget(ok_button)
+
+        self.setLayout(layout)
+
+class AboutDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle('About')
+        self.setGeometry(100, 100, 386, 292)
+
+        self.initUI()
+
+    def initUI(self):
+        label = QtWidgets.QLabel()
+        label.setGeometry(QtCore.QRect(70, 20, 251, 61))
+        label.setText("")
+        label.setPixmap(QtGui.QPixmap("logo.jpg"))
+        label.setObjectName("label")
+        about_label = QtWidgets.QLabel("Image Segmantation Tool\n"
+                                        "Version: 1.0.0\n"
+                                        "\n"
+                                        "Description:\n"
+                                        "HSV filter-based image labeling tool.\n"
+                                        "\n"
+                                        "Author: Mojtaba Bahramgiri\n"
+                                        "Copyright: © 2024 MTU-APSRC\n"
+                                        "\n"
+                                        "Follow us at https://www.linkedin.com/company/apslabs\n"
+                                        "\n"
+                                        "Thank you for using Image Segmantation Tool!")
+        ok_button = QtWidgets.QPushButton('OK', self)
+        ok_button.clicked.connect(self.accept)
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(about_label)
+        layout.addWidget(ok_button)
+
+        self.setLayout(layout)
 
 class xml_parse_value:
     def __init__(self, file):
