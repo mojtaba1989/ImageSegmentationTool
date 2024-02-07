@@ -11,6 +11,8 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 import json
 
+from Assist import Ui_AssistApp
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -22,12 +24,6 @@ class Ui_MainWindow(object):
         self.White.setCheckable(True)
         self.White.setChecked(True)
         self.White.setObjectName("White")
-        self.threshold_w = QtWidgets.QSlider(self.White)
-        self.threshold_w.setGeometry(QtCore.QRect(84, 159, 41, 16))
-        self.threshold_w.setOrientation(QtCore.Qt.Horizontal)
-        self.threshold_w.setObjectName("threshold_w")
-        self.threshold_w.setMaximum(255)
-        self.threshold_w.setValue(50)
         self.label_8 = QtWidgets.QLabel(self.White)
         self.label_8.setGeometry(QtCore.QRect(12, 130, 80, 16))
         self.label_8.setObjectName("label_8")
@@ -84,20 +80,15 @@ class Ui_MainWindow(object):
         self.mask_val_w.setGeometry(QtCore.QRect(84, 180, 41, 23))
         self.mask_val_w.setObjectName("mask_val_w")
         self.mask_val_w.setText('255')
-        self.threshold_w_d = QtWidgets.QLabel(self.White)
-        self.threshold_w_d.setGeometry(QtCore.QRect(140, 160, 31, 16))
-        self.threshold_w_d.setObjectName("threshold_w_d")
+        self.threshold_w = QtWidgets.QLineEdit(self.White)
+        self.threshold_w.setGeometry(QtCore.QRect(84, 153, 41, 23))
+        self.threshold_w.setObjectName("threshold_w")
+        self.threshold_w.setText('50')
         self.Green = QtWidgets.QGroupBox(self.centralwidget)
         self.Green.setGeometry(QtCore.QRect(220, 580, 191, 211))
         self.Green.setCheckable(True)
         self.Green.setChecked(True)
         self.Green.setObjectName("Green")
-        self.threshold_g = QtWidgets.QSlider(self.Green)
-        self.threshold_g.setGeometry(QtCore.QRect(84, 159, 41, 16))
-        self.threshold_g.setOrientation(QtCore.Qt.Horizontal)
-        self.threshold_g.setObjectName("threshold_g")
-        self.threshold_g.setMaximum(255)
-        self.threshold_g.setValue(50)
         self.label_10 = QtWidgets.QLabel(self.Green)
         self.label_10.setGeometry(QtCore.QRect(12, 130, 80, 16))
         self.label_10.setObjectName("label_10")
@@ -154,20 +145,15 @@ class Ui_MainWindow(object):
         self.mask_val_g.setGeometry(QtCore.QRect(84, 180, 41, 23))
         self.mask_val_g.setObjectName("mask_val_g")
         self.mask_val_g.setText('80')
-        self.threshold_g_d = QtWidgets.QLabel(self.Green)
-        self.threshold_g_d.setGeometry(QtCore.QRect(140, 160, 31, 16))
-        self.threshold_g_d.setObjectName("threshold_g_d")
+        self.threshold_g = QtWidgets.QLineEdit(self.Green)
+        self.threshold_g.setGeometry(QtCore.QRect(84, 153, 41, 23))
+        self.threshold_g.setObjectName("threshold_g")
+        self.threshold_g.setText("50")
         self.Yellow = QtWidgets.QGroupBox(self.centralwidget)
         self.Yellow.setGeometry(QtCore.QRect(420, 580, 191, 211))
         self.Yellow.setCheckable(True)
         self.Yellow.setChecked(True)
         self.Yellow.setObjectName("Yellow")
-        self.threshold_y = QtWidgets.QSlider(self.Yellow)
-        self.threshold_y.setGeometry(QtCore.QRect(84, 159, 41, 16))
-        self.threshold_y.setOrientation(QtCore.Qt.Horizontal)
-        self.threshold_y.setObjectName("threshold_y")
-        self.threshold_y.setMaximum(255)
-        self.threshold_y.setValue(50)
         self.label_17 = QtWidgets.QLabel(self.Yellow)
         self.label_17.setGeometry(QtCore.QRect(12, 130, 80, 16))
         self.label_17.setObjectName("label_17")
@@ -224,9 +210,10 @@ class Ui_MainWindow(object):
         self.mask_val_y.setGeometry(QtCore.QRect(84, 180, 41, 23))
         self.mask_val_y.setObjectName("mask_val_y")
         self.mask_val_y.setText('170')
-        self.threshold_y_d = QtWidgets.QLabel(self.Yellow)
-        self.threshold_y_d.setGeometry(QtCore.QRect(140, 160, 31, 16))
-        self.threshold_y_d.setObjectName("threshold_y_d")
+        self.threshold_y = QtWidgets.QLineEdit(self.Yellow)
+        self.threshold_y.setGeometry(QtCore.QRect(84, 153, 41, 23))
+        self.threshold_y.setObjectName("threshold_y")
+        self.threshold_y.setText("50")
         self.Img = QtWidgets.QLabel(self.centralwidget)
         self.Img.setGeometry(QtCore.QRect(136, 70, 667, 500))
         self.Img.setMouseTracking(True)
@@ -357,6 +344,8 @@ class Ui_MainWindow(object):
         self.actionNext.setObjectName("actionNext")
         self.actionPrevious = QtWidgets.QAction(MainWindow)
         self.actionPrevious.setObjectName("actionPrevious")
+        self.actionHSVtool = QtWidgets.QAction(MainWindow)
+        self.actionHSVtool.setObjectName("actionHSVtool")
         self.menuFile.addAction(self.actionOpen_Folder)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
@@ -364,6 +353,7 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionAbout)
         self.menuProcess.addAction(self.actionUpdate)
         self.menuProcess.addAction(self.actionShow_Mask)
+        self.menuProcess.addAction(self.actionHSVtool)
         self.menuControl.addAction(self.actionNext)
         self.menuControl.addAction(self.actionPrevious)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -399,6 +389,7 @@ class Ui_MainWindow(object):
         self.actionShow_Mask.triggered.connect(self.actionShow_Mask_command)
         self.actionHelp.triggered.connect(self.showHelpDialog)
         self.actionAbout.triggered.connect(self.showAboutDialog)
+        self.actionHSVtool.triggered.connect(self.hsvAssist_command)
 
         self.mask.clicked.connect(self.mask_command)
         self.next.clicked.connect(self.next_command)
@@ -414,9 +405,6 @@ class Ui_MainWindow(object):
 
         # Show slider values
         self.sky_val.valueChanged.connect(self.sky_val_read)
-        self.threshold_g.valueChanged.connect(self.threshold_g_read)
-        self.threshold_w.valueChanged.connect(self.threshold_w_read)
-        self.threshold_y.valueChanged.connect(self.threshold_y_read)
 
         # Auto update on check uncheck
         self.White.toggled.connect(self.applyAll)
@@ -432,6 +420,7 @@ class Ui_MainWindow(object):
         self.val_min_w.textChanged.connect(lambda: self.check_input_val(self.val_min_w))
         self.val_max_w.textChanged.connect(lambda: self.check_input_val(self.val_max_w))
         self.mask_val_w.textChanged.connect(lambda: self.check_input_val(self.mask_val_w))
+        self.threshold_w.textChanged.connect(lambda: self.check_input_val(self.threshold_w))
         self.sat_min_g.textChanged.connect(lambda: self.check_input_val(self.sat_min_g))
         self.sat_max_g.textChanged.connect(lambda: self.check_input_val(self.sat_max_g))
         self.hue_min_g.textChanged.connect(lambda: self.check_input_val(self.hue_min_g))
@@ -439,6 +428,7 @@ class Ui_MainWindow(object):
         self.val_min_g.textChanged.connect(lambda: self.check_input_val(self.val_min_g))
         self.val_max_g.textChanged.connect(lambda: self.check_input_val(self.val_max_g))
         self.mask_val_g.textChanged.connect(lambda: self.check_input_val(self.mask_val_g))
+        self.threshold_g.textChanged.connect(lambda: self.check_input_val(self.threshold_g))
         self.sat_min_y.textChanged.connect(lambda: self.check_input_val(self.sat_min_y))
         self.sat_max_y.textChanged.connect(lambda: self.check_input_val(self.sat_max_y))
         self.hue_min_y.textChanged.connect(lambda: self.check_input_val(self.hue_min_y))
@@ -446,6 +436,7 @@ class Ui_MainWindow(object):
         self.val_min_y.textChanged.connect(lambda: self.check_input_val(self.val_min_y))
         self.val_max_y.textChanged.connect(lambda: self.check_input_val(self.val_max_y))
         self.mask_val_y.textChanged.connect(lambda: self.check_input_val(self.mask_val_y))
+        self.threshold_y.textChanged.connect(lambda: self.check_input_val(self.threshold_y))
 
         # Exit
         app.aboutToQuit.connect(self.beforeClose_command)
@@ -513,6 +504,8 @@ class Ui_MainWindow(object):
         self.actionNext.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.actionPrevious.setText(_translate("MainWindow", "Previous"))
         self.actionPrevious.setShortcut(_translate("MainWindow", "Ctrl+P"))
+        self.actionHSVtool.setText(_translate("MainWindow", "HSV Assist"))
+        self.actionHSVtool.setShortcut(_translate("MainWindow", "Ctrl+A"))
 
     def prob_out_command(self, hsv_values=None):
         if hsv_values is not None:
@@ -686,7 +679,7 @@ class Ui_MainWindow(object):
                     self.val_min_w.setText(parser.get('filters/White/val/min'))
                     self.val_max_w.setText(parser.get('filters/White/val/max'))
                     self.smooth_size_w.setCurrentText(parser.get('filters/White/smooth/size'))
-                    self.threshold_w.setValue(int(parser.get('filters/White/smooth/thresh')))
+                    self.threshold_w.setText(parser.get('filters/White/smooth/thresh'))
 
                 self.Green.setChecked(True if parser.get('filters/Green/active')=='True' else False)
                 if self.Green.isChecked():
@@ -698,7 +691,7 @@ class Ui_MainWindow(object):
                     self.val_min_g.setText(parser.get('filters/Green/val/min'))
                     self.val_max_g.setText(parser.get('filters/Green/val/max'))
                     self.smooth_size_g.setCurrentText(parser.get('filters/Green/smooth/size'))
-                    self.threshold_g.setValue(int(parser.get('filters/Green/smooth/thresh')))
+                    self.threshold_g.setText(parser.get('filters/Green/smooth/thresh'))
 
                 self.Yellow.setChecked(True if parser.get('filters/Yellow/active')=='True' else False)
                 if self.Yellow.isChecked():
@@ -710,7 +703,7 @@ class Ui_MainWindow(object):
                     self.val_min_y.setText(parser.get('filters/Yellow/val/min'))
                     self.val_max_y.setText(parser.get('filters/Yellow/val/max'))
                     self.smooth_size_y.setCurrentText(parser.get('filters/Yellow/smooth/size'))
-                    self.threshold_y.setValue(int(parser.get('filters/Yellow/smooth/thresh')))
+                    self.threshold_y.setText(parser.get('filters/Yellow/smooth/thresh'))
 
                 self.sky_filter.setChecked(True if parser.get('filters/Sky/enable')=='True' else False)
                 if self.sky_filter.isChecked():
@@ -778,7 +771,7 @@ class Ui_MainWindow(object):
                     self.val_min_w.setText(parser.get('filters/White/val/min'))
                     self.val_max_w.setText(parser.get('filters/White/val/max'))
                     self.smooth_size_w.setCurrentText(parser.get('filters/White/smooth/size'))
-                    self.threshold_w.setValue(int(parser.get('filters/White/smooth/thresh')))
+                    self.threshold_w.setText(parser.get('filters/White/smooth/thresh'))
 
                 self.Green.setChecked(True if parser.get('filters/Green/active')=='True' else False)
                 if self.Green.isChecked():
@@ -790,7 +783,7 @@ class Ui_MainWindow(object):
                     self.val_min_g.setText(parser.get('filters/Green/val/min'))
                     self.val_max_g.setText(parser.get('filters/Green/val/max'))
                     self.smooth_size_g.setCurrentText(parser.get('filters/Green/smooth/size'))
-                    self.threshold_g.setValue(int(parser.get('filters/Green/smooth/thresh')))
+                    self.threshold_g.setText(parser.get('filters/Green/smooth/thresh'))
 
                 self.Yellow.setChecked(True if parser.get('filters/Yellow/active')=='True' else False)
                 if self.Yellow.isChecked():
@@ -802,7 +795,7 @@ class Ui_MainWindow(object):
                     self.val_min_y.setText(parser.get('filters/Yellow/val/min'))
                     self.val_max_y.setText(parser.get('filters/Yellow/val/max'))
                     self.smooth_size_y.setCurrentText(parser.get('filters/Yellow/smooth/size'))
-                    self.threshold_y.setValue(int(parser.get('filters/Yellow/smooth/thresh')))
+                    self.threshold_y.setText(parser.get('filters/Yellow/smooth/thresh'))
 
                 self.sky_filter.setChecked(True if parser.get('filters/Sky/enable')=='True' else False)
                 if self.sky_filter.isChecked():
@@ -896,7 +889,7 @@ class Ui_MainWindow(object):
                 epars   = ET.SubElement(eVal, 'max'); epars.text = self.val_max_w.text()
                 eFil    = ET.SubElement(efilter, 'smooth')
                 epars   = ET.SubElement(eFil, 'size'); epars.text = str(self.smooth_size_w.currentText())
-                epars   = ET.SubElement(eFil, 'thresh'); epars.text = str(self.threshold_w.value())
+                epars   = ET.SubElement(eFil, 'thresh'); epars.text = self.threshold_w.text()
             else:
                 eLabel  = ET.SubElement(efilter, 'label'); eLabel.text = ""
                 eHue    = ET.SubElement(efilter, 'hue')              
@@ -928,7 +921,7 @@ class Ui_MainWindow(object):
                 epars   = ET.SubElement(eVal, 'max'); epars.text = self.val_max_g.text()
                 eFil    = ET.SubElement(efilter, 'smooth')
                 epars   = ET.SubElement(eFil, 'size'); epars.text = str(self.smooth_size_g.currentText())
-                epars   = ET.SubElement(eFil, 'thresh'); epars.text = str(self.threshold_g.value())
+                epars   = ET.SubElement(eFil, 'thresh'); epars.text = self.threshold_g.text()
             else:
                 eLabel  = ET.SubElement(efilter, 'label'); eLabel.text = ""
                 eHue    = ET.SubElement(efilter, 'hue')              
@@ -960,7 +953,7 @@ class Ui_MainWindow(object):
                 epars   = ET.SubElement(eVal, 'max'); epars.text = self.val_max_y.text()
                 eFil    = ET.SubElement(efilter, 'smooth')
                 epars   = ET.SubElement(eFil, 'size'); epars.text = str(self.smooth_size_y.currentText())
-                epars   = ET.SubElement(eFil, 'thresh'); epars.text = str(self.threshold_y.value())
+                epars   = ET.SubElement(eFil, 'thresh'); epars.text = self.threshold_y.text()
             else:
                 eLabel  = ET.SubElement(efilter, 'label'); eLabel.text = ""
                 eHue    = ET.SubElement(efilter, 'hue')              
@@ -1025,15 +1018,6 @@ class Ui_MainWindow(object):
 
     def sky_val_read(self):
         self.sky_val_d.setText(f"{self.sky_val.value()}")
-    
-    def threshold_g_read(self):
-        self.threshold_g_d.setText(f"{self.threshold_g.value()}")
-
-    def threshold_w_read(self):
-        self.threshold_w_d.setText(f"{self.threshold_w.value()}")
-
-    def threshold_y_read(self):
-        self.threshold_y_d.setText(f"{self.threshold_y.value()}")
 
     def check_input_val(self, obj):
         try:
@@ -1051,9 +1035,10 @@ class Ui_MainWindow(object):
             hsv_min = np.array([int(self.hue_min_w.text()), int(self.sat_min_w.text()), int(self.val_min_w.text())])
             hsv_max = np.array([int(self.hue_max_w.text()), int(self.sat_max_w.text()), int(self.val_max_w.text())])
             tmp = cv2.inRange(self.HSV, hsv_min, hsv_max)
-            kernel = np.ones((int(self.smooth_size_w.currentText()), int(self.smooth_size_w.currentText())))
+            filter_size = int(self.smooth_size_w.currentText())
+            kernel = np.ones((filter_size,filter_size))/filter_size**2
             tmp = cv2.filter2D(tmp,-1,kernel)
-            roi = tmp > int(self.threshold_w.value())
+            roi = tmp > int(self.threshold_w.text())
             self.MASK[roi] = int(self.mask_val_w.text())
     
     def applyGreen(self):
@@ -1061,9 +1046,10 @@ class Ui_MainWindow(object):
             hsv_min = np.array([int(self.hue_min_g.text()), int(self.sat_min_g.text()), int(self.val_min_g.text())])
             hsv_max = np.array([int(self.hue_max_g.text()), int(self.sat_max_g.text()), int(self.val_max_g.text())])
             tmp = cv2.inRange(self.HSV, hsv_min, hsv_max)
-            kernel = np.ones((int(self.smooth_size_g.currentText()), int(self.smooth_size_g.currentText())))
+            filter_size = int(self.smooth_size_g.currentText())
+            kernel = np.ones((filter_size,filter_size))/filter_size**2
             tmp = cv2.filter2D(tmp,-1,kernel)
-            roi = tmp > int(self.threshold_g.value())
+            roi = tmp > int(self.threshold_g.text())
             self.MASK[roi] = int(self.mask_val_g.text())
     
     def applyYellow(self):
@@ -1071,9 +1057,10 @@ class Ui_MainWindow(object):
             hsv_min = np.array([int(self.hue_min_y.text()), int(self.sat_min_y.text()), int(self.val_min_y.text())])
             hsv_max = np.array([int(self.hue_max_y.text()), int(self.sat_max_y.text()), int(self.val_max_y.text())])
             tmp = cv2.inRange(self.HSV, hsv_min, hsv_max)
-            kernel = np.ones((int(self.smooth_size_y.currentText()), int(self.smooth_size_y.currentText())))
+            filter_size = int(self.smooth_size_y.currentText())
+            kernel = np.ones((filter_size,filter_size))/filter_size**2
             tmp = cv2.filter2D(tmp,-1,kernel)
-            roi = tmp > int(self.threshold_y.value())
+            roi = tmp > int(self.threshold_y.text())
             self.MASK[roi] = int(self.mask_val_y.text())
     
     def applySkyFilter(self):
@@ -1122,6 +1109,19 @@ class Ui_MainWindow(object):
     def showAboutDialog(self):
         about_dialog = AboutDialog()
         about_dialog.exec_()
+
+    def hsvAssist_command(self):
+        if self.INDEX != -1:
+            self.window = QtWidgets.QMainWindow()
+            self.ui = Ui_AssistApp()
+            self.ui.setupUi(self.window, self.IMG_LIST[self.INDEX], self)
+            self.window.show()
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Image Not Found")
+            msg.setText("No JPG/PNG file found!")
+            msg.setIcon(QMessageBox.Critical)
+            msg.exec_()
 
 class HelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -1205,7 +1205,7 @@ class xml_parse_value:
             return current_element.text
         else:
             return False
-        
+
 def display_prep(image):
     img = image.copy()
     img = cv2.resize(img, (800,600))

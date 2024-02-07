@@ -7,6 +7,7 @@ This application is an Image Segmentation Tool designed to process and analyze i
 - **Color Segmentation:** Segmentation parameters can be adjusted for three different colors: White, Green, and Yellow.
 - **Filter Sky:** An optional feature to filter out sky regions from the images.
 - **HSV Sampling:** Allows users to sample HSV values from the image using a brush of customizable size.
+- **HSV Assist:** Allows users to use dynamic environment to optimize HSV values from the image using standard opencv tool.
 - **Navigation:** Navigate through images, save segmentation results, and flag images.
 
 ## How to Use

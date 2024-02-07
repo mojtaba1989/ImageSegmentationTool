@@ -32,19 +32,6 @@
     <property name="checked">
      <bool>true</bool>
     </property>
-    <widget class="QSlider" name="threshold_w">
-     <property name="geometry">
-      <rect>
-       <x>84</x>
-       <y>159</y>
-       <width>41</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
@@ -250,17 +237,17 @@
       <string>255</string>
      </property>
     </widget>
-    <widget class="QLabel" name="threshold_w_d">
+    <widget class="QLineEdit" name="threshold_w">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>160</y>
-       <width>31</width>
-       <height>16</height>
+       <x>84</x>
+       <y>153</y>
+       <width>41</width>
+       <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>0</string>
      </property>
     </widget>
    </widget>
@@ -282,19 +269,6 @@
     <property name="checked">
      <bool>true</bool>
     </property>
-    <widget class="QSlider" name="threshold_g">
-     <property name="geometry">
-      <rect>
-       <x>84</x>
-       <y>159</y>
-       <width>41</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
@@ -500,17 +474,17 @@
       <string>80</string>
      </property>
     </widget>
-    <widget class="QLabel" name="threshold_g_d">
+    <widget class="QLineEdit" name="threshold_g">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>160</y>
-       <width>31</width>
-       <height>16</height>
+       <x>84</x>
+       <y>153</y>
+       <width>41</width>
+       <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>0</string>
      </property>
     </widget>
    </widget>
@@ -532,19 +506,6 @@
     <property name="checked">
      <bool>true</bool>
     </property>
-    <widget class="QSlider" name="threshold_y">
-     <property name="geometry">
-      <rect>
-       <x>84</x>
-       <y>159</y>
-       <width>41</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
@@ -750,23 +711,22 @@
       <string>160</string>
      </property>
     </widget>
-    <widget class="QLabel" name="threshold_y_d">
+    <widget class="QLineEdit" name="threshold_y">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>160</y>
-       <width>31</width>
-       <height>16</height>
+       <x>84</x>
+       <y>153</y>
+       <width>41</width>
+       <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>0</string>
      </property>
     </widget>
     <zorder>sat_min_y</zorder>
     <zorder>label_18</zorder>
     <zorder>sat_max_y</zorder>
-    <zorder>threshold_y</zorder>
     <zorder>label_17</zorder>
     <zorder>hue_max_y</zorder>
     <zorder>val_max_y</zorder>
@@ -780,7 +740,7 @@
     <zorder>label_23</zorder>
     <zorder>label_24</zorder>
     <zorder>mask_val_y</zorder>
-    <zorder>threshold_y_d</zorder>
+    <zorder>threshold_y</zorder>
    </widget>
    <widget class="QLabel" name="Img">
     <property name="geometry">
