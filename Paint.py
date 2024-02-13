@@ -25,20 +25,24 @@ class Ui_PaintApp(object):
         self.img.setObjectName("img")
         self.scrollArea.setWidget(self.img)
         self.widget = QtWidgets.QWidget(self.centralwidget)
-        self.widget.setGeometry(QtCore.QRect(50, 620, 710, 26))
+        self.widget.setGeometry(QtCore.QRect(25, 620, 760, 26))
         self.widget.setObjectName("widget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.undo = QtWidgets.QPushButton(self.widget)
         self.undo.setObjectName("undo")
+        self.undo.setToolTip("CTRL+Z")
         self.horizontalLayout.addWidget(self.undo)
         self.erase = QtWidgets.QPushButton(self.widget)
         self.erase.setObjectName("erase")
+        self.erase.setToolTip("Eraser only works as brush\nPress ESC or click on Draw to change back to draw")
         self.horizontalLayout.addWidget(self.erase)
-        self.label = QtWidgets.QLabel(self.widget)
-        self.label.setObjectName("label")
-        self.horizontalLayout.addWidget(self.label)
+        self.tool = QtWidgets.QComboBox(self.widget)
+        self.tool.setObjectName("tool")
+        self.tool.addItems(["Brush", "Line"])
+        self.tool.setToolTip("Brush: click to start, hold to draw and release to end\n----\nLine:click to start/add a point to polygon and press ESC to finish drawing")
+        self.horizontalLayout.addWidget(self.tool)
         self.brushSize = QtWidgets.QSpinBox(self.widget)
         self.brushSize.setObjectName("brushSize")
         self.brushSize.setMinimum(1)
@@ -66,6 +70,7 @@ class Ui_PaintApp(object):
         self.horizontalLayout.addWidget(self.fit)
         self.saveButton = QtWidgets.QPushButton(self.widget)
         self.saveButton.setObjectName("saveButton")
+        self.saveButton.setToolTip("Saves modified image with same filename.\nCheck \"PATH_TO_FILE\"/_modified/ directory")
         self.horizontalLayout.addWidget(self.saveButton)
         PaintApp.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(PaintApp)
@@ -91,7 +96,9 @@ class Ui_PaintApp(object):
         self.ERASE = False
         self.SCALE = 1
         self.BRUSH = self.WHITE
-        self.FILENAME = ""
+        self.POLYGON = []
+        self.PREVIOUS_TOOL = None
+        self.SAVED_BEFORE_EXIT = True
 
         self.retranslateUi(PaintApp)
         QtCore.QMetaObject.connectSlotsByName(PaintApp)
@@ -109,6 +116,7 @@ class Ui_PaintApp(object):
         self.img.mouseMoveEvent = self.on_mouse_move
         self.img.mouseReleaseEvent = self.on_mouse_release
         PaintApp.closeEvent = self.closeEvent
+        PaintApp.keyPressEvent = self.keyPressEvent
 
         self.update()
         self.history_check()
@@ -119,7 +127,6 @@ class Ui_PaintApp(object):
         self.erase.setText(_translate("PaintApp", "Eraser"))
         self.undo.setText(_translate("PaintApp", "Undo"))
         self.undo.setShortcut(_translate("PaintApp", "Ctrl+z"))
-        self.label.setText(_translate("PaintApp", "Brush size"))
         self.label_2.setText(_translate("PaintApp", "Color"))
         self.zoomin.setText(_translate("PaintApp", "Zoom In"))
         self.zoomout.setText(_translate("PaintApp", "Zoom Out"))
@@ -139,9 +146,14 @@ class Ui_PaintApp(object):
         half_sample_size = sample_size // 2
         cv2.circle(mask, (actual_pos_x, actual_pos_y), half_sample_size, self.BRUSH, -1)
         self.update(mask=mask)
+        if self.tool.currentText()=='Line':
+            self.POLYGON.append((actual_pos_x, actual_pos_y))
+            if len(self.POLYGON) > 1:
+                cv2.line(mask, self.POLYGON[-2], self.POLYGON[-1], self.BRUSH, sample_size)
+
 
     def on_mouse_move(self, event):
-        if self.CLICKED:
+        if self.CLICKED and self.tool.currentText()=='Brush':
             pos = self.img.mapFromGlobal(self.scrollArea.mapToGlobal(event.pos()))
             h_scrollbar_value = self.scrollArea.horizontalScrollBar().value()
             v_scrollbar_value = self.scrollArea.verticalScrollBar().value()
@@ -152,19 +164,33 @@ class Ui_PaintApp(object):
             half_sample_size = sample_size // 2
             cv2.circle(mask, (actual_pos_x, actual_pos_y), half_sample_size, self.BRUSH, -1)
             self.update(mask=mask)
+        elif self.CLICKED and self.tool.currentText()=='Line':
+            pos = self.img.mapFromGlobal(self.scrollArea.mapToGlobal(event.pos()))
+            h_scrollbar_value = self.scrollArea.horizontalScrollBar().value()
+            v_scrollbar_value = self.scrollArea.verticalScrollBar().value()
+            actual_pos_x = int((pos.x() - h_scrollbar_value) / self.SCALE)
+            actual_pos_y = int((pos.y() - v_scrollbar_value) / self.SCALE)
+            mask = self.LMASK[-1].copy()
+            sample_size = self.brushSize.value()
+            cv2.line(mask, self.POLYGON[-1], (actual_pos_x, actual_pos_y), self.BRUSH, sample_size)
+            self.update(mask=mask)
 
     def on_mouse_release(self, event):
-        self.CLICKED = False
+        if self.tool.currentText() == 'Brush':
+            self.CLICKED = False
         self.history_check()
     
     def erase_command(self):
         if not self.ERASE:
             self.ERASE = True
-            self.erase.setText(QtCore.QCoreApplication.translate("PaintApp", "Color"))
+            self.erase.setText(QtCore.QCoreApplication.translate("PaintApp", "Draw"))
             self.BRUSH = self.CLREAR
+            self.PREVIOUS_TOOL = self.tool.currentText()
+            self.tool.setCurrentText("Brush")
         else:
             self.ERASE = False
             self.erase.setText(QtCore.QCoreApplication.translate("PaintApp", "Erase"))
+            self.tool.setCurrentText(self.PREVIOUS_TOOL)
             self.brush_color_change()
             
     def brush_color_change(self):
@@ -174,19 +200,6 @@ class Ui_PaintApp(object):
             self.BRUSH = self.GREEN
         elif self.target.currentText() == "Yellow":
             self.BRUSH = self.YELLOW
-
-    def showWarning(self, message):
-        if self.WARN:
-            msg = QMessageBox()
-            msg.setWindowTitle("Bad Argument")
-            msg.setText(message)
-            msg.setIcon(QMessageBox.Critical)
-            chk = QtWidgets.QCheckBox()
-            chk.setText("Do show this again")
-            msg.setCheckBox(chk)
-            msg.exec_()
-            if chk.isChecked():
-                self.WARN = False
 
     def update(self, mask=None):
         img = self.IMG.copy()
@@ -200,6 +213,7 @@ class Ui_PaintApp(object):
         self.pixmap = QtGui.QPixmap.fromImage(q_image)
         self.img.setPixmap(self.pixmap)
         self.resize_image()
+        self.SAVED_BEFORE_EXIT = False
 
     def undo_command(self):
         if len(self.LMASK) > 1:
@@ -235,9 +249,8 @@ class Ui_PaintApp(object):
         scaled_pixmap = self.pixmap.scaled(self.SCALE * size)
         self.img.setPixmap(scaled_pixmap)
 
-    def save_command(self, app):
-        dir = os.path.dirname(self.image) + '/Originals'
-        print(dir)
+    def save_command(self):
+        dir = os.path.dirname(self.image) + '/_modified'
         filename = os.path.basename(self.image)
         if not os.path.exists(dir):
             os.mkdir(dir)        
@@ -246,12 +259,45 @@ class Ui_PaintApp(object):
             img[self.LMASK[-1] > 0] = self.LMASK[-1][self.LMASK[-1] > 0]
         except:
             pass
-        cv2.imwrite(self.image, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        cv2.imwrite(os.path.join(dir, filename), cv2.cvtColor(self.IMG, cv2.COLOR_BGR2RGB))
+        cv2.imwrite(os.path.join(dir, filename), cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        self.SAVED_BEFORE_EXIT = True
+    
+    def keyPressEvent(self, event):
+        if event.key() == 16777216:  #ESC
+            self.CLICKED = False
+            self.POLYGON.clear()
+            self.update(mask=self.LMASK[-1])
+            self.ERASE = False
+            self.erase.setText(QtCore.QCoreApplication.translate("PaintApp", "Erase"))
+            self.tool.setCurrentText(self.PREVIOUS_TOOL)
+            self.brush_color_change()
 
     def closeEvent(self, event):
-        if self.master_obj:
-            self.master_obj.reload(f"{self.FILENAME} has been added to list", self.FILENAME)
+        if self.SAVED_BEFORE_EXIT and self.master_obj:
+            filename = os.path.basename(self.image)
+            self.master_obj.reload(f"{filename} has been added to \"Modified\" list", filename)
+        elif not self.SAVED_BEFORE_EXIT and self.master_obj:
+            msg = QMessageBox()
+            msg.setWindowTitle("Unsaved changes")
+            msg.setText("Unsaved Changes will be discarded\nSave before proceed?")
+            msg.setIcon(QMessageBox.Warning)
+            msg.setStandardButtons(msg.Save|msg.Ignore)
+            msg.setDefaultButton(msg.Save)
+            result = msg.exec_()
+            if result == msg.Save:
+                self.save_command()
+                filename = os.path.basename(self.image)
+                self.master_obj.reload(f"{filename} has been added to \"Modified\" list", filename)
+        elif not self.SAVED_BEFORE_EXIT:
+            msg = QMessageBox()
+            msg.setWindowTitle("Unsaved changes")
+            msg.setText("Unsaved Changes will be discarded\nSave before proceed?")
+            msg.setIcon(QMessageBox.Warning)
+            msg.setStandardButtons(msg.Save|msg.Ignore)
+            msg.setDefaultButton(msg.Save)
+            result = msg.exec_()
+            if result == msg.Save:
+                self.save_command()
         event.accept()
 
 if __name__ == "__main__":
@@ -259,7 +305,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     PaintApp = QtWidgets.QMainWindow()
     ui = Ui_PaintApp()
-    ui.setupUi(PaintApp, '')
+    ui.setupUi(PaintApp, '/home/moji/python_devel/ImageSegmentationTool/normal.png')
     PaintApp.show()
     sys.exit(app.exec_())
 

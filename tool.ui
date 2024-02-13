@@ -778,7 +778,7 @@
      <rect>
       <x>20</x>
       <y>0</y>
-      <width>601</width>
+      <width>661</width>
       <height>61</height>
      </rect>
     </property>
@@ -852,7 +852,7 @@
       <rect>
        <x>510</x>
        <y>30</y>
-       <width>80</width>
+       <width>71</width>
        <height>23</height>
       </rect>
      </property>
@@ -860,13 +860,27 @@
       <string>Load XML</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="modified_show">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>10</y>
+       <width>61</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Modified
+Version</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="label_27">
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>690</x>
       <y>0</y>
-      <width>281</width>
+      <width>231</width>
       <height>61</height>
      </rect>
     </property>

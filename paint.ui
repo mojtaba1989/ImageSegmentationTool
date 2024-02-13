@@ -90,7 +90,7 @@
      <item>
       <widget class="QPushButton" name="undo">
        <property name="text">
-        <string>Undo(Ctrl+Z)</string>
+        <string>Undo</string>
        </property>
       </widget>
      </item>
@@ -102,11 +102,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Brush size</string>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="tool"/>
      </item>
      <item>
       <widget class="QSpinBox" name="brushSize"/>

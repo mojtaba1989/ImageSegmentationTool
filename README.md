@@ -8,6 +8,7 @@ This application is an Image Segmentation Tool designed to process and analyze i
 - **Filter Sky:** An optional feature to filter out sky regions from the images.
 - **HSV Sampling:** Allows users to sample HSV values from the image using a brush of customizable size.
 - **HSV Assist:** Allows users to use dynamic environment to optimize HSV values from the image using standard opencv tool.
+- **Paint Mask:** Allows users to use dynamic environment to draw on image when normal HSV assist is not sufficient.
 - **Navigation:** Navigate through images, save segmentation results, and flag images.
 
 ## How to Use
@@ -18,6 +19,9 @@ This application is an Image Segmentation Tool designed to process and analyze i
 5. **Show Mask:** Toggle the "Show Mask" option to display the segmentation mask.
 6. **Flag Images:** Flag images using the "Flag it" checkbox.
 7. **Auto Load XML:** Automatically load previously saved parameters from an XML file (if exist).
+8. **HSV Assist:** Open Assist tool to addjust HSV filter parameters in a more dynamic environment and apply optimized parameters to the filter of choice on the main window.
+9. **Paint Mask:** Open Paint Mask to manipulate colors and facilitate HSV parameters selection.
+ 
 
 ## HSV Sampling
 - Activate the "HSV Sampling" checkbox.

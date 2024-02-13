@@ -225,7 +225,7 @@ class Ui_MainWindow(object):
         self.Img.setScaledContents(True)
         self.Img.setObjectName("Img")
         self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setGeometry(QtCore.QRect(20, 0, 601, 61))
+        self.frame.setGeometry(QtCore.QRect(20, 0, 661, 61))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
@@ -235,7 +235,7 @@ class Ui_MainWindow(object):
         self.list_selector = QtWidgets.QComboBox(self.frame)
         self.list_selector.setGeometry(QtCore.QRect(20, 30, 91, 23))
         self.list_selector.setObjectName("list_selector")
-        self.list_selector.addItems(['All', 'Not Processed', 'Prossed and flagged', 'Processed'])
+        self.list_selector.addItems(['All', 'Not Processed', 'Prossed and flagged', 'Processed', 'Modified'])
         self.auto_load_xml = QtWidgets.QCheckBox(self.frame)
         self.auto_load_xml.setGeometry(QtCore.QRect(520, 10, 51, 21))
         self.auto_load_xml.setObjectName("auto_load_xml")
@@ -246,10 +246,13 @@ class Ui_MainWindow(object):
         self.label_26.setGeometry(QtCore.QRect(120, 10, 91, 16))
         self.label_26.setObjectName("label_26")
         self.load_xml = QtWidgets.QPushButton(self.frame)
-        self.load_xml.setGeometry(QtCore.QRect(510, 30, 80, 23))
+        self.load_xml.setGeometry(QtCore.QRect(510, 30, 71, 23))
         self.load_xml.setObjectName("load_xml")
+        self.modified_show = QtWidgets.QPushButton(self.frame)
+        self.modified_show.setGeometry(QtCore.QRect(590, 10, 61, 41))
+        self.modified_show.setObjectName("modified_show")
         self.label_27 = QtWidgets.QLabel(self.centralwidget)
-        self.label_27.setGeometry(QtCore.QRect(630, 0, 281, 61))
+        self.label_27.setGeometry(QtCore.QRect(690, 0, 231, 61))
         self.label_27.setText("")
         self.label_27.setPixmap(QtGui.QPixmap("logo.jpg"))
         self.label_27.setScaledContents(True)
@@ -375,12 +378,14 @@ class Ui_MainWindow(object):
         self.IDXNP = []
         self.IDXP = []
         self.IDXPnF = []
+        self.IDXM = []
         self.DICT = []
-        self.LIST_DICT = {'P': self.IDXP, 'NP': self.IDXNP, 'PnF': self.IDXPnF}
+        self.LIST_DICT = {'P': self.IDXP, 'NP': self.IDXNP, 'PnF': self.IDXPnF, 'M': self.IDXM}
         self.MASK = None
         self.IMG = None
         self.HSV = None
         self.MASK_IS_SHOWN = False
+        self.MODIFIED_IS_SHOWN = False
         self.UNSAVED = False
         self.ASKTOSAVE = True
         
@@ -402,6 +407,7 @@ class Ui_MainWindow(object):
         self.save.clicked.connect(self.save_command)
         self.load_xml.clicked.connect(self.load_xml_command)
         self.saveNnext.clicked.connect(self.saveNnext_command)
+        self.modified_show.clicked.connect(self.modified_show_command)
 
         self.file_selector.currentIndexChanged.connect(self.file_selector_command)
         self.list_selector.currentIndexChanged.connect(self.list_selector_command)
@@ -481,6 +487,8 @@ class Ui_MainWindow(object):
         self.label_25.setText(_translate("MainWindow", "Select List"))
         self.label_26.setText(_translate("MainWindow", "Select Image"))
         self.load_xml.setText(_translate("MainWindow", "Load XML"))
+        self.modified_show.setText(_translate("MainWindow", "Modified\n"
+"Version"))
         self.sky_filter.setTitle(_translate("MainWindow", "Filter Sky"))
         self.prob.setTitle(_translate("MainWindow", "Prob"))
         self.prob_out.setText(_translate("MainWindow", ""))
@@ -511,7 +519,7 @@ class Ui_MainWindow(object):
         self.actionPrevious.setShortcut(_translate("MainWindow", "Ctrl+P"))
         self.actionHSVtool.setText(_translate("MainWindow", "HSV Assist"))
         self.actionHSVtool.setShortcut(_translate("MainWindow", "Ctrl+A"))
-        self.actionPaint.setText(_translate("MainWindow", "Paint Mask"))
+        self.actionPaint.setText(_translate("MainWindow", "Paint Tool"))
 
     def prob_out_command(self, hsv_values=None):
         if hsv_values is not None:
@@ -567,7 +575,8 @@ class Ui_MainWindow(object):
         msg.setIcon(QMessageBox.Information)
         msg.exec_()
         self.mask.setText(QtCore.QCoreApplication.translate("MainWindow", "Show Mask"))
-        self.MASK_IS_SHOWN = False
+        self.DICT = []
+        state_extract(self)
         self.load_img()
         self.show()
 
@@ -627,6 +636,19 @@ class Ui_MainWindow(object):
                 msg.setText("List is Empty!")
                 msg.setIcon(QMessageBox.Warning)
                 msg.exec_()
+
+        elif self.list_selector.currentText() == 'Modified':
+            if self.IDXM:
+                self.INDEX = self.IDXM[0]
+                self.file_selector.clear()
+                self.file_selector.addItems([os.path.basename(f) for f in [self.IMG_LIST[idx] for idx in self.IDXM]])
+            else:
+                self.list_selector.setCurrentIndex(0)
+                msg = QMessageBox()
+                msg.setWindowTitle("Empty")
+                msg.setText("List is Empty!")
+                msg.setIcon(QMessageBox.Warning)
+                msg.exec_()
     
     def actionShow_Mask_command(self):
         self.MASK_IS_SHOWN = True
@@ -667,6 +689,8 @@ class Ui_MainWindow(object):
         try:
             if self.list_selector.currentIndex() == 0: 
                 self.INDEX = self.DICT[self.INDEX]['membership']['gNext']
+            elif self.list_selector.currentIndex() == 4:
+                self.INDEX = self.DICT[self.INDEX]['membership']['mNext']
             else:
                 self.INDEX = self.DICT[self.INDEX]['membership']['Next']
             self.load_img()
@@ -851,6 +875,8 @@ class Ui_MainWindow(object):
         try:
             if self.list_selector.currentIndex() == 0: 
                 self.INDEX = self.DICT[self.INDEX]['membership']['gPrevious']
+            elif self.list_selector.currentIndex() == 4:
+                self.INDEX = self.DICT[self.INDEX]['membership']['mPrevious']
             else:
                 self.INDEX = self.DICT[self.INDEX]['membership']['Previous']
             self.load_img()
@@ -1027,9 +1053,32 @@ class Ui_MainWindow(object):
         else:
             self.load_xml.setEnabled(False)
         
+        if self.DICT[self.INDEX]['modified_file']:
+            self.modified_show.setEnabled(True)
+        else:
+            self.modified_show.setEnabled(False)
+        
+    def modified_show_command(self):
+        if not self.MODIFIED_IS_SHOWN:
+                self.MODIFIED_IS_SHOWN = True
+                img = cv2.imread(self.DICT[self.INDEX]['modified_file'])
+                self.IMG = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                self.HSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+                self.modified_show.setText(QtCore.QCoreApplication.translate("MainWindow", "Original\nVersion"))
+                self.show()
+        else:
+            self.MODIFIED_IS_SHOWN = False
+            img = cv2.imread(self.IMG_LIST[self.INDEX])
+            self.IMG = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            self.HSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            self.modified_show.setText(QtCore.QCoreApplication.translate("MainWindow", "Modified\nVersion"))
+            self.show()
+
 
     def load_img(self):
         self.MASK_IS_SHOWN = False
+        self.MODIFIED_IS_SHOWN = False
+        self.modified_show.setText(QtCore.QCoreApplication.translate("MainWindow", "Modified\nVersion"))
         img = cv2.imread(self.IMG_LIST[self.INDEX])
         self.IMG = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.HSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)  
@@ -1130,9 +1179,13 @@ class Ui_MainWindow(object):
 
     def hsvAssist_command(self):
         if self.INDEX != -1:
+            if self.MODIFIED_IS_SHOWN:
+                img = self.DICT[self.INDEX]['modified_file']
+            else:
+                img = self.IMG_LIST[self.INDEX]
             self.window = QtWidgets.QMainWindow()
             self.ui = Ui_AssistApp()
-            self.ui.setupUi(self.window, self.IMG_LIST[self.INDEX], self)
+            self.ui.setupUi(self.window, img, self)
             self.window.show()
         else:
             msg = QMessageBox()
@@ -1250,15 +1303,20 @@ def display_prep(image):
 
 def state_extract(obj):
     label_directory = os.path.join(obj.DIRECTORY, 'labels')
+    modified_directory = os.path.join(obj.DIRECTORY, '_modified')
     if os.path.exists(label_directory):
         xml_list = [os.path.splitext(f)[0] for f in os.listdir(label_directory) if f.lower().endswith(('xml'))]
         mask_list = [os.path.splitext(f)[0] for f in os.listdir(label_directory) if f.lower().endswith(('png'))]
+
+    if os.path.exists(modified_directory):
+        mod_list = [os.path.splitext(f)[0] for f in os.listdir(modified_directory)]
+
     image_list = [os.path.splitext(os.path.basename(f))[0] for f in obj.IMG_LIST]
     ext_list = [os.path.splitext(os.path.basename(f))[1] for f in obj.IMG_LIST]
     index = 0
-    membership = {'lname':'NP', 'Next':-1, 'Previous': -1, 'gNext': -1, 'gPrevious': -1} # P/NP/PnF
+    membership = {'lname':'NP', 'Next':-1, 'Previous': -1, 'gNext': -1, 'gPrevious': -1, 'mNext': -1, 'mPrevious': -1} # P/NP/PnF
     for img in image_list:
-        entry = {'index':index, 'img_file':'', 'mask_file':None, 'xml_file':None,
+        entry = {'index':index, 'img_file':'', 'mask_file':None, 'xml_file':None, 'modified_file':None,
                   'flagged': False, 'membership': copy.deepcopy(membership)}
         entry['img_file'] = os.path.join(obj.DIRECTORY, img + ext_list[index])
         index += 1
@@ -1266,13 +1324,19 @@ def state_extract(obj):
             entry['xml_file'] = os.path.join(label_directory, img + '.xml')
             with xml_parse_value(entry['xml_file']) as f:
                 entry['flagged'] = True if f.get('flagged') == 'True' else False
+
         if os.path.exists(label_directory) and 'mask_' + img in mask_list:
             entry['mask_file'] = os.path.join(label_directory, 'mask_' + img + '.png')
+
+        if os.path.exists(modified_directory) and img in mod_list:
+            entry['modified_file'] = os.path.join(modified_directory, img + '.png')
+        
         obj.DICT.append(entry)
 
     obj.IDXNP.clear()
     obj.IDXPnF.clear()
     obj.IDXP.clear()
+    obj.IDXM.clear()
     for item in obj.DICT:
         if item['mask_file']:
             if item['flagged']:
@@ -1284,8 +1348,10 @@ def state_extract(obj):
         else:
             item['membership']['lname'] = 'NP'
             obj.IDXNP.append(item['index'])
+        if item['modified_file']:
+            obj.IDXM.append(item['index'])
     major_len = len(obj.IMG_LIST)
-    for lst in obj.LIST_DICT.keys():
+    for lst in ['P', 'NP', 'PnF']:
         minor_len = len(obj.LIST_DICT[lst])
         for idx in range(minor_len):
             item_idx = obj.LIST_DICT[lst][idx]
@@ -1296,6 +1362,13 @@ def state_extract(obj):
             obj.DICT[item_idx]['membership']['gPrevious'] = (item_idx - 1) % major_len 
             obj.DICT[item_idx]['membership']['Next'] = obj.LIST_DICT[lst][(idx + 1) % minor_len] 
             obj.DICT[item_idx]['membership']['Previous'] = obj.LIST_DICT[lst][(idx - 1) % minor_len]
+            
+    minor_len = len(obj.LIST_DICT['M'])
+    for idx in range(minor_len):
+        item_idx = obj.LIST_DICT['M'][idx]
+        obj.DICT[item_idx]['membership']['mNext'] = obj.LIST_DICT['M'][(idx + 1) % minor_len] 
+        obj.DICT[item_idx]['membership']['mPrevious'] = obj.LIST_DICT['M'][(idx - 1) % minor_len]
+        
 
 def move(master, item, dest):
     if item['membership']['lname'] != dest:
