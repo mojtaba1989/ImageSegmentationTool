@@ -12,6 +12,7 @@ from xml.dom import minidom
 import json
 
 from Assist import Ui_AssistApp
+from Paint import Ui_PaintApp
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -346,6 +347,8 @@ class Ui_MainWindow(object):
         self.actionPrevious.setObjectName("actionPrevious")
         self.actionHSVtool = QtWidgets.QAction(MainWindow)
         self.actionHSVtool.setObjectName("actionHSVtool")
+        self.actionPaint = QtWidgets.QAction(MainWindow)
+        self.actionPaint.setObjectName("actionPaint")
         self.menuFile.addAction(self.actionOpen_Folder)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
@@ -354,6 +357,7 @@ class Ui_MainWindow(object):
         self.menuProcess.addAction(self.actionUpdate)
         self.menuProcess.addAction(self.actionShow_Mask)
         self.menuProcess.addAction(self.actionHSVtool)
+        self.menuProcess.addAction(self.actionPaint)
         self.menuControl.addAction(self.actionNext)
         self.menuControl.addAction(self.actionPrevious)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -390,6 +394,7 @@ class Ui_MainWindow(object):
         self.actionHelp.triggered.connect(self.showHelpDialog)
         self.actionAbout.triggered.connect(self.showAboutDialog)
         self.actionHSVtool.triggered.connect(self.hsvAssist_command)
+        self.actionPaint.triggered.connect(self.paint_command)
 
         self.mask.clicked.connect(self.mask_command)
         self.next.clicked.connect(self.next_command)
@@ -506,6 +511,7 @@ class Ui_MainWindow(object):
         self.actionPrevious.setShortcut(_translate("MainWindow", "Ctrl+P"))
         self.actionHSVtool.setText(_translate("MainWindow", "HSV Assist"))
         self.actionHSVtool.setShortcut(_translate("MainWindow", "Ctrl+A"))
+        self.actionPaint.setText(_translate("MainWindow", "Paint Mask"))
 
     def prob_out_command(self, hsv_values=None):
         if hsv_values is not None:
@@ -551,7 +557,20 @@ class Ui_MainWindow(object):
                 self.load_settings(not self.auto_load_xml.isChecked())
                 self.show()
                 self.load_default_xml()
-    
+
+    def reload(self, message="", goto=None):
+        image_files = [f for f in os.listdir(self.DIRECTORY) if f.lower().endswith(("png", "jpg"))]
+        self.IMG_LIST =  sorted([os.path.join(self.DIRECTORY, file) for file in image_files])
+        msg = QMessageBox()
+        msg.setWindowTitle("Reload Image List")
+        msg.setText(message)
+        msg.setIcon(QMessageBox.Information)
+        msg.exec_()
+        self.mask.setText(QtCore.QCoreApplication.translate("MainWindow", "Show Mask"))
+        self.MASK_IS_SHOWN = False
+        self.load_img()
+        self.show()
+
     def file_selector_command(self):
         try:
             full_name = os.path.join(self.DIRECTORY, self.file_selector.currentText())
@@ -565,7 +584,6 @@ class Ui_MainWindow(object):
             pass
     
     def list_selector_command(self):
-        print(self.LIST_DICT)
         if self.list_selector.currentText() == 'All':
             self.INDEX = 0
             self.file_selector.clear()
@@ -1122,6 +1140,21 @@ class Ui_MainWindow(object):
             msg.setText("No JPG/PNG file found!")
             msg.setIcon(QMessageBox.Critical)
             msg.exec_()
+
+    def paint_command(self):
+        if self.INDEX != -1:
+            self.paint = QtWidgets.QMainWindow()
+            self.uip = Ui_PaintApp()
+            self.uip.setupUi(self.paint, self.IMG_LIST[self.INDEX], self)
+            self.paint.show()
+            
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Image Not Found")
+            msg.setText("No JPG/PNG file found!")
+            msg.setIcon(QMessageBox.Critical)
+            msg.exec_()
+    
 
 class HelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):

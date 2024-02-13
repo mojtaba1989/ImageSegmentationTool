@@ -2,42 +2,26 @@
 <ui version="4.0">
  <class>AssistApp</class>
  <widget class="QMainWindow" name="AssistApp">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>679</height>
+    <width>831</width>
+    <height>698</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="img">
-    <property name="geometry">
-     <rect>
-      <x>8</x>
-      <y>4</y>
-      <width>781</width>
-      <height>431</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>../../rosbag/ACM-BIKE-SAMPLE/normal.png</pixmap>
-    </property>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>11</x>
-      <y>440</y>
+      <x>30</x>
+      <y>470</y>
       <width>781</width>
       <height>152</height>
      </rect>
@@ -315,29 +299,54 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="closeButton">
-    <property name="geometry">
-     <rect>
-      <x>710</x>
-      <y>600</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Close</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>600</y>
-      <width>250</width>
-      <height>25</height>
+      <x>60</x>
+      <y>630</y>
+      <width>715</width>
+      <height>26</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Brush size</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="brushSize"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="sample">
+       <property name="text">
+        <string>Sample</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="zoomin">
+       <property name="text">
+        <string>Zoom In</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="zoomout">
+       <property name="text">
+        <string>Zoom Out</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="fit">
+       <property name="text">
+        <string>Fit Screen</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QLabel" name="label_8">
        <property name="text">
@@ -361,13 +370,73 @@
      </item>
     </layout>
    </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>10</y>
+      <width>821</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>819</width>
+       <height>449</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="img">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>781</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>781</width>
+        <height>431</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>781</width>
+        <height>431</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../rosbag/ACM-BIKE-SAMPLE/normal.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>831</width>
      <height>20</height>
     </rect>
    </property>
